@@ -82,6 +82,7 @@ sfm.fit(X_train, y_train)
 
 # Features selected
 featureNames = list(features.columns.values) # creating a list with features' names
+print("Feature names:")
 for featureNameListindex in sfm.get_support(indices=True):
     print(featureNames[featureNameListindex])
 
