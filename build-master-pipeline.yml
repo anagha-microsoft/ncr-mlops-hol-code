@@ -5,12 +5,13 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  resourceGroup: 'mlops-0-basic-rg'
-  amlWorkspace: 'mlops-0-basic-amlws'
+  resourceGroup: '<yourResourceGroup>'
+  amlWorkspace: '<yourAMLWorkspace>'
   experiment: 'chd-prediction'
   amlComputeTargetName: 'chd-temp-compute'
   modelName: 'chd-predictor'
   containerImageName: 'chd-predictor-image'
+  serviceConnection: '<yourServiceConnectionName>'
 
 steps:
 
@@ -30,34 +31,30 @@ steps:
 - task: AzureCLI@1
   displayName: 'Build step 3 - Install the AML CLI extension to Azure CLI on the agent'
   inputs:
-    azureSubscription: mlops0Basic-sub-conexion
+    azureSubscription: $(serviceConnection)
     scriptLocation: inlineScript
     inlineScript: 'az extension add -n azure-cli-ml'
 
 - task: AzureCLI@1
   displayName: 'Build step 4 - Attach directory on agent, to AML workspace'
   inputs:
-    azureSubscription: mlops0Basic-sub-conexion
+    azureSubscription: $(serviceConnection)
     scriptLocation: inlineScript
     inlineScript: 'az ml folder attach -e $(experiment) -w $(amlWorkspace) -g $(resourceGroup) --path $(Build.SourcesDirectory)'
 
 - task: AzureCLI@1
   displayName: 'Build step 5 - Provision AML managed compute for training'
   inputs:
-    azureSubscription: mlops0Basic-sub-conexion
+    azureSubscription: $(serviceConnection)
     scriptLocation: inlineScript
-    inlineScript: 'az ml run submit-script -d ./scripts-operationalize/aml-compute-dependencies.yml 
-    ./scripts-operationalize/provision-aml-compute.py --aml_compute_target $(amlComputeTargetName) 
-    --path $(Build.SourcesDirectory)'
+    inlineScript: 'az ml run submit-script -d ./scripts-operationalize/aml-compute-dependencies.yml ./scripts-operationalize/provision-aml-compute.py --aml_compute_target $(amlComputeTargetName) --path $(Build.SourcesDirectory)'
 
 - task: AzureCLI@1
   displayName: 'Build step 6 - Define and launch build pipeline'
   inputs:
-    azureSubscription: mlops0Basic-sub-conexion
+    azureSubscription: $(serviceConnection)
     scriptLocation: inlineScript
-    inlineScript: 'az ml run submit-script -d ./scripts-operationalize/aml-compute-dependencies.yml 
-    ./scripts-operationalize/aml-pipeline-for-build.py --aml_compute_target $(amlComputeTargetName) 
-    --model_name $(modelName) --build_number $(Build.BuildNumber) --image_name $(containerImageName) --path $(Build.SourcesDirectory)'
+    inlineScript: 'az ml run submit-script -d ./scripts-operationalize/aml-compute-dependencies.yml ./scripts-operationalize/aml-pipeline-for-build.py --aml_compute_target $(amlComputeTargetName) --model_name $(modelName) --build_number $(Build.BuildNumber) --image_name $(containerImageName) --path $(Build.SourcesDirectory)'
 
 - task: CopyFiles@2
   displayName: 'Build step 7 - Copy build artifacts to -  $(Build.ArtifactStagingDirectory)'
