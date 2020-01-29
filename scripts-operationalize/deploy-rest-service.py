@@ -189,7 +189,7 @@ print("14. Quick test of REST API on one record")
 # Single test data
 testDataset = {"data":[[61, 1, 150, 103]]}
 # Call the webservice to make predictions on the test data
-testPrediction=aksRestService.run(json.dumps(testDataset))
+testPrediction = aksRestService.run(json.dumps(testDataset))
 print('..... Test data prediction should be 1 (age=61, prevalentHyp = 1, sysBP = 150, glucose = 103): ', testPrediction)
 print('..14.completed')
 print('')
