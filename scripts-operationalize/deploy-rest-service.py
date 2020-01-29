@@ -112,7 +112,7 @@ print('..8.completed')
 print('')
 print('')
 
-print('9. AKS creation')
+print('9. AKS inference cluster creation')
 
 computeList = amlWs.compute_targets
 aksTarget = None
@@ -120,7 +120,7 @@ if aksName in computeList:
     aksTarget = computeList[aksName]
     
 if aksTarget == None:
-    print("..... No AKS found. Creating new Aks: {} and AKS Webservice: {}".format(aksName, aksServiceName))
+    print("..... No AKS inference cluster found. Creating new Aks inference cluster: {} and AKS REST service: {}".format(aksName, aksServiceName))
     provisioningConfig = AksCompute.provisioning_configuration(location=aksRegion)
     # Create the cluster
     aksTarget = ComputeTarget.create(workspace=amlWs, name=aksName, provisioning_configuration=provisioningConfig)
@@ -155,14 +155,14 @@ print('')
 print('11. Create output Json with Rest service details')
 
 api_key, _ = aksRestService.get_keys()
-print("....Deployed AKS Webservice: {} \nWebservice Uri: {} \nWebservice API Key: {}".
+print("....Deployed AKS REST service: {} \nREST service Uri: {} \nREST service API Key: {}".
       format(aksRestService.name, aksRestService.scoring_uri, api_key))
 
 aksRestServiceJson = {}
 aksRestServiceJson["aksServiceName"] = aksRestService.name
 aksRestServiceJson["aks_service_url"] = aksRestService.scoring_uri
 aksRestServiceJson["aks_service_api_key"] = api_key
-print("....AKS Webservice Info")
+print("....AKS REST service Info")
 print(aksRestServiceJson)
 
 print('..11.completed')
